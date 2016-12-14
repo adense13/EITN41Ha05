@@ -12,7 +12,7 @@ public class B1 {
 	
 	String publicIdentity;
 	BigInteger p,q, M;
-	ArrayList<byte[]> unenryptedBits;
+	ArrayList<BigInteger> unenryptedBits;
 	BigInteger biNegative, bi0, bi1, bi2, bi3, bi4, bi5, bi6, bi7, bi8, bi9;
 	Random random;
 
@@ -22,7 +22,7 @@ public class B1 {
 		this.q = new BigInteger(q, 16);
 		this.unenryptedBits = new ArrayList();
 		for(int i = 0; i < unencryptedBits.length; i++){
-			this.unenryptedBits.add(hexToByte(unencryptedBits[i]));
+			this.unenryptedBits.add(new BigInteger(unencryptedBits[i], 16));
 		}
 		M = this.p.multiply(this.q);
 		biNegative = BigInteger.valueOf(-1);
@@ -129,24 +129,21 @@ public class B1 {
 		BigInteger r = a.modPow(rUp, M);
 		System.out.println("r = "+r.toString(16));
 		
-		ArrayList<byte[]> bitOutputs = new ArrayList();
-		String res = "";
+		String msg = "";
 		for(int i = 0; i < unenryptedBits.size(); i++){
-			hashedID = SHA1(unenryptedBits.get(i));
-			while(jacobi2(new BigInteger(byteToHex(hashedID), 16),M) != 1){
-				
-				hashedID = SHA1(hashedID);
+			BigInteger s = unenryptedBits.get(i);
+			BigInteger t = (s.add(r.multiply(bi2)));
+			int temp = jacobi2(t,M);
+			if(temp == -1){
+				msg = msg + "0";
 			}
-			bitOutputs.add(hashedID);
+			else{
+				msg = msg + "1";
+			}
 		}
-		
-		
-//		BigInteger x = bi1;
-//		if(random.nextInt(2) == 0){
-//			x = biNegative;
-//		}
-//		BigInteger t = BigInteger.valueOf(random.nextInt(Integer.MAX_VALUE)).mod(M);
-//		BigInteger s = t.add(a.divide(t)).mod(M);
+		int decMsg = Integer.parseInt(msg, 2);
+		System.out.println("msg: "+msg);
+		System.out.println("msg (decimal): " + decMsg);
 	}
 	
 	//SOURCE: https://www.ime.usp.br/~rt/cranalysis/IBECCocks.pdf
