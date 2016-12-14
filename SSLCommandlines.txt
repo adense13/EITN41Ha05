@@ -1,0 +1,14 @@
+C:\OpenSSL-Win32\bin\openssl.exe
+cms -decrypt -in C:\OpenSSL-Win32\bin\mail1.msg -recip C:\OpenSSL-Win32\bin\certreceiver.pem -inkey C:\OpenSSL-Win32\bin\keyreceiver.pem
+cms -verify -in C:\OpenSSL-Win32\bin\mail1.msg -signer C:\OpenSSL-Win32\bin\certreceiver.pem -out C:\OpenSSL-Win32\bin\mail1out.text
+
+-------------------------------------------
+HALP BELOW
+-------------------------------------------
+openssl cms -digest_create -in mail1.msg -signer UNKNOWN.pem -text ????
+openssl cms -encrypt -in PLAIN.text -CAMELLIA128???? -out MAIL.msg CERT.pem
+
+
+openssl cms -sign -in encr.txt -signer signer.pem -text | openssl cms -encrypt -out smencsign.txt signer.pem 
+
+openssl smime -decrypt -in smencsign.txt -recip signer.pem -inkey signer.pem
