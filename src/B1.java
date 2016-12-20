@@ -15,6 +15,14 @@ public class B1 {
 	ArrayList<BigInteger> unenryptedBits;
 	BigInteger biNegative, bi0, bi1, bi2, bi3, bi4, bi5, bi6, bi7, bi8, bi9;
 	Random random;
+	
+	static BigInteger zero = BigInteger . ZERO ;
+	static BigInteger one = BigInteger .ONE;
+	static BigInteger two = new BigInteger ("2");
+	static BigInteger three = new BigInteger ("3");
+	static BigInteger four = new BigInteger ("4");
+	static BigInteger five = new BigInteger ("5");
+	static BigInteger eight = new BigInteger ("8");
 
 	public B1(String publicIdentity, String p, String q, String[] unencryptedBits){
 		this.publicIdentity = publicIdentity;
@@ -65,61 +73,41 @@ public class B1 {
 		return md.digest(arr);
 	}
 	
-	//TAKEN FROM: https://cryptocode.wordpress.com/2008/08/16/jacobi-symbol/
-	public BigInteger jacobi(BigInteger a, BigInteger n) {
-	    BigInteger ans = BigInteger.valueOf(1337);
-	    if (a.compareTo(bi0) == 0)
-	        ans = (n.compareTo(bi1) == 0) ? bi1 : bi0;
-	    else if (a.compareTo(bi2) == 0) {
-	        switch ( n.mod(bi8).intValue() ) {
-	            case 1:
-	            case 7:
-	                    ans.equals(1);
-	                    break;
-	            case 3:
-	            case 5:
-	                    ans.equals(-1);
-	                    break;
-	        }
-	    }
-	    else if ( a.compareTo(n) >= 0 )
-	        ans = jacobi(a.mod(n), n);
-	    else if ( a.mod(bi2).compareTo(bi0) == 0 )
-	        ans = (jacobi(bi2,n)).multiply(jacobi(a.divide(bi2), n));
-	    else
-	        ans = ( a.mod(bi4).compareTo(bi3) == 0 && n.mod(bi4).compareTo(bi3) == 0 ) ? jacobi(n,a).multiply(biNegative) : jacobi(n,a);
-	    return ans;
+	public int jacobi(BigInteger n, BigInteger m) {
+		int j = 1;
+		int t;
+		BigInteger tmp;
+		n = n.mod(m);
+		while (!n.equals(zero)) {
+			t = 0;
+			while (!n.and(one).equals(one)) {
+				n = n.divide(two);
+				t++;
+			}
+			BigInteger mmod8 = m.mod(eight);
+			if (((t & 0x01) == 1)
+					&& (mmod8.equals(three) || mmod8.equals(five))) {
+				j = -j;
+			}
+			if (n.mod(four).equals(three) && m.mod(four).equals(three)) {
+				j = -j;
+			}
+			tmp = n;
+			n = m.mod(n);
+			m = tmp;
+		}
+		if (m.equals(one)) {
+			return j;
+		}
+		return 0;
 	}
-	
-	public int jacobi2(BigInteger a, BigInteger n) {
-		int ans = 0;
-		if (bi0.equals(a))
-			ans = (bi1.equals(n)) ? 1 : 0;
-		else if (bi2.equals(a)) {
-			BigInteger mod = n.mod(bi8);
-			if (bi1.equals(mod) || bi7.equals(mod))
-				ans = 1;
-			else if (bi3.equals(mod) || bi5.equals(mod))
-				ans = -1;
-		} else if (a.compareTo(n) >= 0)
-			ans = jacobi2(a.mod(n), n);
-		else if (bi0.equals(a.mod(bi2)))
-			ans = jacobi2(bi2, n) * jacobi2(a.divide(bi2), n);
-		else
-			ans = (bi3.equals(a.mod(bi4)) && bi3.equals(n.mod(bi4))) ? -jacobi2(n, a) : jacobi2(n, a);
-		return ans;
-	}
+
 		
 	public void run(){
 		BigInteger jakobiSymbol = bi0;
 		byte[] hashedID = SHA1(publicIdentity.getBytes());
 		String dot = ".";
-//		while(jakobiSymbol.compareTo(bi1) != 0){
-//			hashedID = SHA1(hashedID);
-//			jakobiSymbol = BigInteger.valueOf( jacobi2( (new BigInteger(hashedID) ), bi0) );
-//			System.out.print(dot);
-//		}
-		while(jacobi2(new BigInteger(byteToHex(hashedID), 16),M) != 1){
+		while(jacobi(new BigInteger(byteToHex(hashedID), 16),M) != 1){
 			System.out.print(dot);
 			hashedID = SHA1(hashedID);
 		}
@@ -133,7 +121,7 @@ public class B1 {
 		for(int i = 0; i < unenryptedBits.size(); i++){
 			BigInteger s = unenryptedBits.get(i);
 			BigInteger t = (s.add(r.multiply(bi2)));
-			int temp = jacobi2(t,M);
+			int temp = jacobi(t,M);
 			if(temp == -1){
 				msg = msg + "0";
 			}
@@ -148,16 +136,16 @@ public class B1 {
 	
 	//SOURCE: https://www.ime.usp.br/~rt/cranalysis/IBECCocks.pdf
 	public static void main(String[] args){
-		String bitStr01 = "2f2aa07cfb07c64be95586cfc394ebf26c2f383f90ce1d494dde9b2a3728ae9b";
-		String bitStr02 = "63ed324439c0f6b823d4828982a1bbe5c34e66d985f55792028acd2e207daa4f";
-		String bitStr03 = "85bb7964196bf6cce070a5e8f30bc822018a7ad70690b97814374c54fddf8e4b";
-		String bitStr04 = "30fbcc37643cc433d42581f784e3a0648c91c9f46b5671b71f8cc65d2737da5c";
-		String bitStr05 = "5a732f73fb288d2c90f537a831c18250af720071b6a7fac88a5de32b0df67c53";
-		String bitStr06 = "504d6be8542e546dfbd78a7ac470fab7f35ea98f2aff42c890f6146ae4fe11d6";
-		String bitStr07 = "10956aff2a90c54001e85be12cb2fa07c0029c608a51c4c804300b70a47c33bf";
-		String bitStr08 = "461aa66ef153649d69b9e2c699418a7f8f75af3f3172dbc175311d57aeb0fd12";
+		String bitStr01 = "771bb448bfd68e320193b25d6a01018dd139ae4ee9fa8f5df319e50b44f0418b";
+		String bitStr02 = "7fbe5f33122084221aeec53a8175ca2997250687f7518e528130a3ea4f3d6948";
+		String bitStr03 = "0df4136273b4f77ed66c91ed2c8351612cf5b8de22d8d29531972d1eca6b4b68";
+		String bitStr04 = "068c9a0281859bb62a66de4c75264d234c34fa8ee10114abd86b2ed70363efa8";
+		String bitStr05 = "078f4cbfee88121422e60915154ec0e7e91af1e13ae6ade40c1f389287a50c3c";
+		String bitStr06 = "2e6777640cd02dd0b26e1846c142aaa32cdb3bbbe8ec9d080ce74469ee11408b";
+		String bitStr07 = "4acae1f2dadf8c5e2ef67349816c5aa441f1af527c5834ee619a783e524c0ac1";
+		String bitStr08 = "3f4553a2e7b171c86a750d96d341cb89e82e1fd2018f1cd66e3e4482e7873012";
 		String[] bits = {bitStr01, bitStr02, bitStr03, bitStr04, bitStr05, bitStr06, bitStr07, bitStr08};
-		B1 b1 = new B1("walterwhite@crypto.sec", "9240633d434a8b71a013b5b00513323f", "f870cfcd47e6d5a0598fc1eb7e999d1b", bits);
+		B1 b1 = new B1("mallory@crypto.sec", "9240633d434a8b71a013b5b00513323f", "f870cfcd47e6d5a0598fc1eb7e999d1b", bits);
 		b1.run();
 	}
 }

@@ -1,8 +1,15 @@
 C:\OpenSSL-Win32\bin\openssl.exe
 cms -decrypt -in C:\OpenSSL-Win32\bin\mail1.msg -recip C:\OpenSSL-Win32\bin\certreceiver.pem -inkey C:\OpenSSL-Win32\bin\keyreceiver.pem -out C:\OpenSSL-Win32\bin\m1DecryptOut.txt
 cms -digest_verify -in C:\OpenSSL-Win32\bin\mail1.msg -signer C:\OpenSSL-Win32\bin\certreceiver.pem -out C:\OpenSSL-Win32\bin\m1VerifyOut.txt
+
+cms -digest_verify -in C:\OpenSSL-Win32\bin\m1DecryptOut.txt -signer C:\OpenSSL-Win32\bin\certreceiver.pem -out C:\OpenSSL-Win32\bin\m1VerifyOut.txt
 //repeat
 mail1 var successful. Subject line: 14570 (i test-quizz)
+
+REAL QUIZZ
+cms -decrypt -in C:\OpenSSL-Win32\bin\b2quizz\mail1.msg -recip C:\OpenSSL-Win32\bin\b2quizz\certreceiver.pem -inkey C:\OpenSSL-Win32\bin\b2quizz\keyreceiver.pem -out C:\OpenSSL-Win32\bin\b2quizz\m1DecryptOut.txt
+cms -digest_verify -in C:\OpenSSL-Win32\bin\b2quizz\m1DecryptOut.txt -signer C:\OpenSSL-Win32\bin\b2quizz\certreceiver.pem -out C:\OpenSSL-Win32\bin\b2quizz\m1VerifyOut.txt
+
 -------------------------------------------
 HALP BELOW
 -------------------------------------------
